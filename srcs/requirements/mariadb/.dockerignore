@@ -1,0 +1,75 @@
+# Temporary files
+*~
+*.tmp
+*.temp
+*.bak
+
+# Dependency directories
+vendor/
+packages/
+
+# Test and coverage files  
+coverage/
+.coverage
+*.cover
+*.py,cover
+htmlcov/
+tests/
+
+# Compiled files
+*.pyc
+*.pyo
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Database files
+*.db
+*.sqlite
+
+# Documentation files
+docs/
+doc/
+*.md
+*.rst
+CHANGELOG
+LICENSE
+AUTHORS
+
+# Config files containing sensitive info
+.htaccess
+.nginx/
+.ssh/
+
+# OS specific files
+.Spotlight-V100
+.Trashes
+
+# SSL certificates (don't store in repo)
+*.pem
+*.crt
+*.key
+
+# WordPress specific
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/*
+wp-content/backup-db/*
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/cache/*
+wp-content/cache/supercache/*
+
+# PHP specific 
+.php_cs.cache
+composer.phar
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
