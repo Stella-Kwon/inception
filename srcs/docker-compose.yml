@@ -1,4 +1,4 @@
-version: '3'
+# version: '3' // 예전방식이라 필요없음
 
 services:
   nginx:

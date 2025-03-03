@@ -1,43 +1,49 @@
 # Makefile for Inception Project
 
-# Variables
-DOCKER_COMPOSE_FILE = srcs/docker-compose.yml
-DATA_PATH = ~/data
-DOMAIN_NAME = $(USER).42.fr
+# # Variables
+Docker_Compose_File = srcs/docker-compose.yml
+Data_Path = ~/data
+Domain_Name = $(USER).42.fr
 
-all: hosts_config dirs up
+all: host_config up
 
 # Set up hosts file (requires sudo)
-hosts_config:
-	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts; then \
-		echo "Adding $(DOMAIN_NAME) to /etc/hosts (may require password)"; \
-		sudo sh -c 'echo "127.0.0.1 $(DOMAIN_NAME)" >> /etc/hosts'; \
-		sudo sh -c 'echo "127.0.0.1 www.$(DOMAIN_NAME)" >> /etc/hosts'; \
+host_config:
+	@if ! grep -q "$(Domain_Name)" /ete/hosts; then\
+	echo "Adding $(Domain_Name) to /etc/hosts"; \
+	sudo sh -c 'echo "127.0.0.1 $(Domain_Name)" >> /etc/hosts'; \
+	sudo sh -c 'echo "127.0.0.1 www.$(Domain_Name)" >> /etc/hosts'; \
 	fi
 
 # Create required directories
-dirs:
-	mkdir -p $(DATA_PATH)/wordpress
-	mkdir -p $(DATA_PATH)/mariadb
+backup_dirs:
+	mkdir -p $(Data_Path)/wordpress
+	mkdir -p $(Data_Path)/mariadb
 
 # Build and start containers
-up: dirs
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d --build
+up: backup_dirs
+	docker compose -f $(Docker_Compose_File) up -d --build
 
-# Stop containers
+# Stop containers only
 down:
-	docker compose -f $(DOCKER_COMPOSE_FILE) down
+	docker compose -f $(Docker_Compose_File) down
 
-# Remove containers, networks and images used by services
-clean: down
-	docker compose -f $(DOCKER_COMPOSE_FILE) down --volumes --rmi all
+# Stop containers and Clean up project data directories
+clean:
+	docker compose -f $(Docker_Compose_File) down --volumes --rmi all
 
-# Full cleanup including directories and system prune
+# Full cleanup including directories
 fclean: clean
-	sudo rm -rf $(DATA_PATH)/wordpress/*
-	sudo rm -rf $(DATA_PATH)/mariadb/*
-	docker system prune -f
-	@echo "Note: If you want to remove entries from /etc/hosts, edit the file manually"
+	sudo rm -rf $(Data_Path)/wordpress/*
+	sudo rm -rf $(Data_Path)/mariadb/*
+	@echo "Project data directories have been cleaned"
+
+# Remove all unused Docker resources system-wide
+prune:
+	@echo "WARNING: This will remove ALL unused Docker resources system-wide"
+	@echo "Press Enter to continue or Ctrl+C to cancel..."
+	@read
+	docker system prune
 
 # Rebuild everything
 re: fclean all
@@ -47,8 +53,17 @@ status:
 	@echo "Docker containers status:"
 	@docker ps -a
 	@echo "\nDocker volumes:"
-	@docker volume ls | grep inception
+	@if docker volume ls | grep -q inception; then \
+		docker volume ls | grep inception; \
+	else \
+		echo "No inception volumes found"; \
+	fi
 	@echo "\nDocker networks:"
-	@docker network ls | grep inception
+	@if docker network ls | grep -q inception; then \
+		docker network ls | grep inception; \
+	else \
+		echo "No inception networks found"; \
+	fi
 
-.PHONY: all hosts_config dirs up down clean fclean re status
+.PHONY: all hosts_config backup_dirs up down clean fclean re status
+
