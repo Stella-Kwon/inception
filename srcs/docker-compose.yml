@@ -1,63 +1,97 @@
-# version: '3' // 예전방식이라 필요없음
-
 services:
-  nginx:
+
+  nginx: 
     build: 
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-    container_name: nginx
+        context: ./requirements/nginx
+        dockerfile: Dockerfile
+    container_name: inception_nginx 
+    #다른 컨테이너와도 같이 사용할때는 굳이 incpetion을 붙히지않아도 되지만 
+    #여러 프로젝트와 연결되어 사용되면 주로 proxy_nginx와 같이 사용.
+    #현재는 incpetion에서만 사용하기 때문에 (하나의 도메인 + 443포트 연결) incpetion을 붙힌다.
     ports:
-      - "443:443"
+      - "443:443" #HTTPS rediects
+      # - "80:80" HTTP redirects
     volumes:
-      - wordpress_data:/var/www/html
+      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      # - ./requirements/nginx/conf/conf.d:/etc/nginx/conf.d #추가적으로 설정파일을 넣을경우 사용
+      #Nginx needs to access the WordPress files (PHP files, images, CSS, etc.) to serve them
+      #standard achitecture for Nginx to serve static files and pass PHP requests to PHP-FPM
+      - wordpress_vol:/var/www/html #웹 관련 파일을 저장할 디렉토리
     networks:
-      - inception_network
+      - inception
     depends_on:
-      - wordpress
-    restart: always
+        WordPress
+    restart: always 
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl -f https://localhost/wp-admin/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3  
 
   wordpress:
     build:
-      context: ./requirements/wordpress
-      dockerfile: Dockerfile
-    container_name: wordpress
+        context:  ./requirements/wordpress
+        dockerfile: Dockerfile
+    container_name: inception_wordpress
     volumes:
-      - wordpress_data:/var/www/html
+      # WordPress needs to write to the volume to save data like configuration, plugins, themes, etc. 
+      # - wordpress_vol:/var/www/html #전체 파일 말고 /  불필요한 파일까지 남아 있을 위험이 있음.
+      - wordpress_vol:/var/www/html/wp-content #wp-content 폴더만 볼륨으로 사용/ DB만 있으면 동일한 사이트를 복원 가능.
+      # wp-content 폴더가 /var/www/html 안에 자동으로 생김.
+      # - ./requirements/wordpress/wp-config.php:/var/www/html/wp-config.php
+      # - ./requirements/wordpress/plugins:/var/www/html/wp-content/plugins
+      # - ./requirements/wordpress/themes:/var/www/html/wp-content/themes
     networks:
-      - inception_network
+      - inception
     depends_on:
       - mariadb
     restart: always
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl -f http://localhost/wp-includes/version.php || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mariadb:
     build:
-      context: ./requirements/mariadb
-      dockerfile: Dockerfile
-    container_name: mariadb
+        context: ./requirements/mariadb
+        dockerfile: Dockerfile
+    container_name: inception_mariadb
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - mariadb_vol:/var/lib/mysql #웹 관련 데이터를 저장할 디렉토리
     networks:
-      - inception_network
+      - inception
     restart: always
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-volumes:
-  wordpress_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/${USER}/data/wordpress
-      o: bind
-  mariadb_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/${USER}/data/mariadb
-      o: bind
+  volumes:
+    wordpress_vol:
+      driver: local
+      driver_opts:
+        type: none
+        device: ~/data/wordpress
+        o: bind
+    mariadb_vol:
+      driver: local
+      driver_opts:
+        type: none
+        device: ~/data/mariadb
+        o: bind
+# type: none: 호스트 파일 시스템의 특정 디렉토리를 볼륨으로 사용하도록 지정합니다.
+# device: 호스트 파일 시스템의 경로를 지정합니다.
+# o: bind: 바인드 마운트를 사용하도록 지정합니다.
 
-networks:
-  inception_network:
-    driver: bridge
+  networks:
+    inception:
+      name: inception_network
+      driver: bridge
