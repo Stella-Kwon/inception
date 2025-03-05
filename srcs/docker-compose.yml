@@ -9,7 +9,7 @@ services:
     #여러 프로젝트와 연결되어 사용되면 주로 proxy_nginx와 같이 사용.
     #현재는 incpetion에서만 사용하기 때문에 (하나의 도메인 + 443포트 연결) incpetion을 붙힌다.
     ports:
-      - "443:443" #HTTPS rediects
+      - "443:443" #HTTPS rediects : Then Docker automatically binds port 443 on the host to port 443 in the container.
       # - "80:80" HTTP redirects
     volumes:
       - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
@@ -21,7 +21,9 @@ services:
       - inception
     depends_on:
         WordPress
-    restart: always 
+    restart: always
+    env_file:
+      - .env
     healthcheck:
       test: ["CMD", "bash", "-c", "curl -f https://localhost/wp-admin/ || exit 1"]
       interval: 30s
@@ -35,8 +37,8 @@ services:
     container_name: inception_wordpress
     volumes:
       # WordPress needs to write to the volume to save data like configuration, plugins, themes, etc. 
-      # - wordpress_vol:/var/www/html #전체 파일 말고 /  불필요한 파일까지 남아 있을 위험이 있음.
-      - wordpress_vol:/var/www/html/wp-content #wp-content 폴더만 볼륨으로 사용/ DB만 있으면 동일한 사이트를 복원 가능.
+      - wordpress_vol:/var/www/html #전체 파일 말고 / there is file that recreated when container gets restarted : but you need this to access every data for the nginx
+      - wordpress_content:/var/www/html/wp-content #wp-content 폴더만 볼륨으로 사용/ DB만 있으면 동일한 사이트를 복원 가능.
       # wp-content 폴더가 /var/www/html 안에 자동으로 생김.
       # - ./requirements/wordpress/wp-config.php:/var/www/html/wp-config.php
       # - ./requirements/wordpress/plugins:/var/www/html/wp-content/plugins
@@ -73,7 +75,7 @@ services:
       retries: 3
 
   volumes:
-    wordpress_vol:
+    wordpress_content:
       driver: local
       driver_opts:
         type: none
