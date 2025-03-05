@@ -1,6 +1,6 @@
 # Nginx 이미지 빌드
-
-FROM alpine:3.16
+# getting image from dockerhub
+FROM alpine:3.16 
 
 # 필요한 패키지 설치
 RUN apk update && apk add --no-cache nginx openssl
