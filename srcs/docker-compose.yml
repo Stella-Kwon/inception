@@ -19,7 +19,7 @@ services:
     networks:
       - inception
     depends_on:
-      - WordPress
+      - wordpress
     restart: always
     env_file:
       - .env
