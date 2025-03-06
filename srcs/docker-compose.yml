@@ -12,15 +12,16 @@ services:
       - "443:443" #HTTPS rediects : Then Docker automatically binds port 443 on the host to port 443 in the container.
       # - "80:80" HTTP redirects
     volumes:
-      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-      # - ./requirements/nginx/conf/conf.d:/etc/nginx/conf.d #추가적으로 설정파일을 넣을경우 사용
       #Nginx needs to access the WordPress files (PHP files, images, CSS, etc.) to serve them
       #standard achitecture for Nginx to serve static files and pass PHP requests to PHP-FPM
       - wordpress_vol:/var/www/html #웹 관련 파일을 저장할 디렉토리
+      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      # - ./requirements/nginx/conf/conf.d:/etc/nginx/conf.d #추가적으로 설정파일을 넣을경우 사용
+
     networks:
       - inception
     depends_on:
-        WordPress
+      - WordPress
     restart: always
     env_file:
       - .env
