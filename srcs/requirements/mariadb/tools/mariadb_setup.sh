@@ -7,9 +7,14 @@
 
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     # 데이터베이스 초기화
+    # Creates database files
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-    # 임시 서버 시작
+    #Starts temporary mysqld in background (PID 2+)
+    # 임시 서버 시작 :  running on background as the shell script (mariadb_setup.sh) is already running as PID 1.
+    # so that Fork a new process for mysqld, Continue executing the script without waiting for mysqld to finish
+    # & specifically creates a background process, which by definition is not the main process
+   
     mysqld --user=mysql --datadir=/var/lib/mysql &
     
     # 서버가 시작될 때까지 대기
@@ -27,8 +32,16 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
         sleep 1
     done
 
+
+    # can use this alternative way then below.
+    # # 환경 변수를 init.sql 파일에 적용
+    # # Use envsubst to replace environment variables in the SQL file
+    # envsubst < /docker-entrypoint-initdb.d/init.sql > /tmp/init.sql
+
+# Configures database
 # 환경 변수로 SQL 파일 생성
-    cat > /tmp/init.sql << EOF
+# Everything between the two EOF markers is written to the file /tmp/init.sql
+cat > /tmp/init.sql << EOF
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
@@ -40,11 +53,14 @@ EOF
     mysql < /tmp/init.sql
     
     # 임시 서버 종료
+    # Shuts down temporary mysqld and
     mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
     
     # 임시 SQL 파일 삭제
     rm /tmp/init.sql
 fi
 
+#Start the mysqld again with pid1
 # MariaDB 서버 실행
+# exec mysqld (without &) does mysqld replace the shell and become PID 1
 exec mysqld --user=mysql 

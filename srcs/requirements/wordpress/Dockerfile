@@ -39,6 +39,7 @@ RUN chmod +x /usr/local/bin/wordpress_setup.sh
 # 필요한 디렉토리 생성
 RUN mkdir -p /run/php
 
+#for documentation 
 EXPOSE 9000
 
 # PHP-FPM 실행
