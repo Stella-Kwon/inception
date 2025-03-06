@@ -36,6 +36,9 @@ host_backup_dirs:
 # Build and start containers
 up: host_backup_dirs
 	@echo "$(GREEN)Building and starting containers...$(RESET)"
+#-d : only gives you an access to the terminal while it is runniing. so all the logs will be hidden😂 
+# It starts the container in the background and returns control to your terminal. That is all what it does. 
+
 	@docker compose -f $(DOCKER_COMPOSE_FILE) up -d --build
 	@echo "$(GREEN)$(BOLD)Inception is now running!$(RESET)"
 	@echo "$(GREEN)Access your website at https://$(DOMAIN_NAME)$(RESET)"
@@ -74,6 +77,24 @@ status:
 	@echo "\n$(CYAN)$(BOLD)Docker networks:$(RESET)"
 	@docker network ls | grep srcs || echo "$(YELLOW)No project networks found.$(RESET)"
 
+# View logs of all services or specific service
+logs:
+	@echo "$(CYAN)Showing logs... (Ctrl+C to exit)$(RESET)"
+	@if [ -z "$(filter-out logs,$(MAKECMDGOALS))" ]; then \
+		docker compose -f $(DOCKER_COMPOSE_FILE) logs -f; \
+	else \
+		docker compose -f $(DOCKER_COMPOSE_FILE) logs -f $(filter-out logs,$(MAKECMDGOALS)); \
+	fi
+
+# Add these targets to make them available as arguments
+nginx:
+	@:
+
+wordpress:
+	@:
+
+mariadb:
+
 # Help command
 help:
 	@echo "$(BOLD)$(UNDERLINE)Inception Project Commands:$(RESET)"
@@ -86,4 +107,4 @@ help:
 	@echo "$(BOLD)make status$(RESET)       : Show status of containers, volumes, and networks"
 	@echo "$(BOLD)make help$(RESET)         : Show this help message"
 
-.PHONY: all hosts_config host_backup_dirs up down clean fclean re status help
+.PHONY: all hosts_config host_backup_dirs up down clean fclean re status help logs

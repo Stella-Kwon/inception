@@ -1,4 +1,5 @@
-FROM alpine:3.16
+#base image to build on
+FROM alpine:3.16 
 
 # 필요한 패키지 설치
 #mariadb-client package contains command-line utilities for connecting to and interacting with MariaDB (or MySQL) servers
@@ -76,4 +77,14 @@ EXPOSE 3306
 
 # MariaDB 초기화 및 실행 -> EntryPoint will set it as PID 1
 # The shell script is responsible for process management inside the container
+
+
+# With Entrypoint i think we should keep that way:) 
+# CMD[] : will be replaced by arguments in runtime 
+# ex) docker run mariadb-image --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci 
+# => then CMD will be replaced to --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci 
+
+# ENTRYPOINT[/usr/local/bin/mariadb_setup.sh]  ensures you to run the cmd always at first as PID1 
+# ex) docker run mariadb-image --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci 
+# => /usr/local/bin/mariadb_setup.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci will be run 
 ENTRYPOINT ["/usr/local/bin/mariadb_setup.sh"]

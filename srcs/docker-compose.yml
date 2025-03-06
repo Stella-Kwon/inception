@@ -1,5 +1,9 @@
 services:
   nginx: 
+    # image: nginx:1.24-alpine :  this is for using images from opensource from github : specify which version 
+    # so you don't need seperate Dockerfile to be exist
+    
+    #  but if you want your own custom image to build through dockerfile then you us build.
     build: 
         context: ./requirements/nginx
         dockerfile: Dockerfile

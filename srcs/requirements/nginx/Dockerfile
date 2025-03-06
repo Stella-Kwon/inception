@@ -1,5 +1,6 @@
 # Nginx 이미지 빌드
-# getting image from dockerhub
+# getting image from dockerhub 
+# but there is ready version as well : FROM nginx:1.24-alpine : if you need
 FROM alpine:3.16 
 
 
