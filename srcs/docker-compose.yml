@@ -73,7 +73,9 @@ services:
       timeout: 10s
       retries: 3
 #########################################################
-volumes:
+volumes:  
+  wordpress_vol:
+  #you need to still specify all the volumes in volumes section even you dont need any additional specific
   wordpress_content:
     driver: local
     driver_opts:
