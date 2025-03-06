@@ -8,6 +8,9 @@ FROM alpine:3.16
 ARG DOMAIN_NAME
 ARG SSL_CERTS
 
+# 환경 변수 설정
+ENV SSL_CERTS=${SSL_CERTS}
+
 # 필요한 패키지 설치
 
 # --no-cache 옵션은 불필요한 캐시 파일을 남기지 않도록 합니다.
@@ -16,8 +19,8 @@ RUN apk update && apk add --no-cache nginx openssl
 # SSL 설정
 RUN mkdir -p ${SSL_CERTS}
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout ${SSL_CERTS}/nginx.key \
-    -out ${SSL_CERTS}/nginx.crt \
+    -keyout "${SSL_CERTS}/nginx.key" \
+    -out "${SSL_CERTS}/nginx.crt" \
     -subj "/C=FI/ST=Uusimaa/L=Helsinki/O=42Helsinki/OU=42Helsinki/CN=${DOMAIN_NAME}"
 
 # NGINX 설정 파일 복사
