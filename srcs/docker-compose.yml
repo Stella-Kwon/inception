@@ -1,5 +1,4 @@
 services:
-
   nginx: 
     build: 
         context: ./requirements/nginx
@@ -17,7 +16,6 @@ services:
       - wordpress_vol:/var/www/html #웹 관련 파일을 저장할 디렉토리
       - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       # - ./requirements/nginx/conf/conf.d:/etc/nginx/conf.d #추가적으로 설정파일을 넣을경우 사용
-
     networks:
       - inception
     depends_on:
@@ -74,25 +72,26 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-  volumes:
-    wordpress_content:
-      driver: local
-      driver_opts:
-        type: none
-        device: ~/data/wordpress
-        o: bind
-    mariadb_vol:
-      driver: local
-      driver_opts:
-        type: none
-        device: ~/data/mariadb
-        o: bind
+#########################################################
+volumes:
+  wordpress_content:
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/wordpress
+      o: bind
+  mariadb_vol:
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/mariadb
+      o: bind
 # type: none: 호스트 파일 시스템의 특정 디렉토리를 볼륨으로 사용하도록 지정합니다.
 # device: 호스트 파일 시스템의 경로를 지정합니다.
 # o: bind: 바인드 마운트를 사용하도록 지정합니다.
 
-  networks:
-    inception:
-      name: inception_network
-      driver: bridge
+############################################################
+networks:
+  inception:
+    name: inception_network
+    driver: bridge
