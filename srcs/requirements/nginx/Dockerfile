@@ -6,7 +6,7 @@ FROM alpine:3.16
 
 # Load build arguments (from docker-compose) from .env
 ARG DOMAIN_NAME
-ARG SSL_DIR
+ARG SSL_CERTS
 
 # 필요한 패키지 설치
 
