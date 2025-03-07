@@ -58,7 +58,7 @@ clean:
 # Full cleanup including directories
 fclean: clean
 	@echo -e "$(RED)$(BOLD)Full cleanup in progress...$(RESET)"
-	@docker network rm inception_network
+	# @docker network rm inception_network 2>/dev/null || true
 	# @docker rm -f mariadb wordpress nginx 2>/dev/null || true
 	# @docker rm -f inception_mariadb inception_wordpress inception_nginx 2>/dev/null || true
 	# @docker rm -f srcs_mariadb srcs_wordpress srcs_nginx 2>/dev/null || true
