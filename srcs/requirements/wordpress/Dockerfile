@@ -42,5 +42,5 @@ RUN mkdir -p /run/php
 #for documentation 
 EXPOSE 9000
 
-# PHP-FPM 실행
-CMD ["php-fpm8", "-F"] 
+#to ensure always setup runs to make wp runs propely.
+ENTRYPOINT ["/usr/local/bin/wordpress_setup.sh"]
