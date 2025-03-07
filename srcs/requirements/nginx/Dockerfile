@@ -16,6 +16,10 @@ ENV SSL_CERTS=${SSL_CERTS}
 # --no-cache 옵션은 불필요한 캐시 파일을 남기지 않도록 합니다.
 RUN apk update && apk add --no-cache nginx openssl
 
+#for user www-data
+# # Create www-data user and group (matching common Linux IDs)
+# RUN addgroup -g 82 -S www-data && adduser -u 82 -D -S -G www-data www-data
+
 # SSL 설정
 RUN mkdir -p ${SSL_CERTS}
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -32,6 +36,10 @@ RUN mkdir -p /var/www/html
 
 #NGINX requires a directory to store its PID (Process ID) file and other runtime data.
 RUN mkdir -p /run/nginx 
+
+#for user www-data
+# # Set proper permissions for www-data
+# RUN chown -R www-data:www-data /var/www/html /run/nginx
 
 # EXPOSE 자체는 컨테이너의 네트워크 설정을 변경하지 않으며, docker run -p 443:443 옵션을 함께 사용해야 합니다.
 # i already mentioned it on my compose file.
