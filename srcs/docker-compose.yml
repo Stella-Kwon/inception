@@ -30,6 +30,10 @@ services:
     restart: always
     env_file:
       - .env
+    # you need this to use variable
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      SSL_CERTS: ${SSL_CERTS}
 # MariaDB 설정 파일 내에서 서버 시작을 기다리는 스크립트와 함께 이 Docker healthcheck를 사용하면 시스템의 안정성이 크게 향상됩니다. 
 # 두 가지 접근 방식은 서로 다른 레벨에서 작동하기 때문에 상호 보완적입니다:
     # MariaDB 컨테이너의 healthcheck는 Docker 시스템에게 컨테이너가 정상인지 알려줍니다.
