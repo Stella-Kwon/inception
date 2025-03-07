@@ -16,6 +16,13 @@ ENV SSL_CERTS=${SSL_CERTS}
 # --no-cache 옵션은 불필요한 캐시 파일을 남기지 않도록 합니다.
 RUN apk update && apk add --no-cache nginx openssl
 
+
+# Create nginx user (in case it doesn’t exist)
+# -D (short for --disabled-password) creates a system user without a password.
+# -g 'nginx' assigns the user to the group named nginx.
+RUN adduser -D -g 'nginx' nginx
+
+
 #for user www-data
 # # Create www-data user and group (matching common Linux IDs)
 # RUN addgroup -g 82 -S www-data && adduser -u 82 -D -S -G www-data www-data
@@ -45,6 +52,11 @@ RUN mkdir -p /run/nginx
 # i already mentioned it on my compose file.
 EXPOSE 443 
 
+#By default, NGINX runs in the background (daemon mode).
+# -g "daemon off;" forces it to run in the foreground, keeping the container running
+
+# make sure conf file is not in /etc/nginx/nginx.conf
+# CMD ["nginx", "-c", "/custom/path/nginx.conf", "-g", "daemon off;"]
 
 # NGINX 실행 // run as pid 1 
 CMD ["nginx", "-g", "daemon off;"]
