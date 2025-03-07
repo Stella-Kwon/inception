@@ -4,8 +4,8 @@
 
 #  [-d PATH ] returns true if PATH exists and is a directory
 #  [ ! -d PATH ] returns true if PATH does not exist or is not a directory
-
-if [ ! -d "/var/lib/mysql/mysql" ]; then
+# This checks for a specific required system table file, which would only exist in a properly initialized MariaDB installation.
+if [ ! -d "/var/lib/mysql/mysql/user.frm" ]; then
     # 데이터베이스 초기화
     # Creates database files
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
@@ -28,9 +28,17 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 # If the command fails (server not ready), sleep for 1 second
 # Repeat until the command succeeds (which means the server is up)
     
-    until mysqladmin ping >/dev/null 2>&1; do
-        sleep 1
-    done
+# Wait for server to start with timeout
+#-gt : greater than
+count=0
+until mysqladmin ping >/dev/null 2>&1; do
+    sleep 1
+    count=$((count+1))
+    if [ $count -gt 30 ]; then
+        echo "Error: MySQL server took too long to start"
+        exit 1
+    fi
+done
 
 
     # can use this alternative way then below.
@@ -42,13 +50,15 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 # 환경 변수로 SQL 파일 생성
 # Everything between the two EOF markers is written to the file /tmp/init.sql
 
-# Check if environment variables are set
+# Check if environment variables are set :  -z checks empty or not
 if [ -z "${MYSQL_DATABASE}" ] || [ -z "${MYSQL_USER}" ] || [ -z "${MYSQL_PASSWORD}" ] || [ -z "${MYSQL_ROOT_PASSWORD}" ]; then
-    echo "Error: Required environment variables are not set"
+    echo "Error: Required environment variables are not set : empty"
     exit 1
 fi
 
 cat > /tmp/init.sql << EOF
+DROP DATABASE IF EXISTS test; 
+DELETE FROM mysql.db WHERE Db='test';
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
@@ -56,21 +66,18 @@ FLUSH PRIVILEGES;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 EOF
 
+# SQL 실행
 if ! mysql < /tmp/init.sql; then
     echo "Error: Failed to execute SQL initialization script"
     cat /tmp/init.sql  # Print the script to see what went wrong
     exit 1
 fi
 
-
-    # SQL 실행
-    mysql < /tmp/init.sql
-    
     # 임시 서버 종료
     # Shuts down temporary mysqld and
-    mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
+    mysqladmin -u root -p ${MYSQL_ROOT_PASSWORD} shutdown
     
-    # 임시 SQL 파일 삭제
+    # # 임시 SQL 파일 삭제
     rm /tmp/init.sql
 fi
 

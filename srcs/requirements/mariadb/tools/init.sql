@@ -5,8 +5,20 @@
 -- SQL initialization script that will be dynamically created using environment variables
 -- This script sets up the initial database, user, and permissions
 
+-- while installation of MySQL/MariaDB, test database created primarily, so this can be vulnerable to get attacked as it is accessible to anyone
+DROP DATABASE IF EXISTS test; 
+DELETE FROM mysql.db WHERE Db='test';
+
+
+--이것은 검색이나 정렬 시 대소문자 구분 없이 결과를 반환하게 됩니다.
+-- WordPress와 같은 애플리케이션에서는 보통 이런 설정을 사용합니다.
+
 -- Create the main application database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+-- 이것은 검색이나 정렬 시 대소문자 구분 없이 결과를 반환하게 됩니다.
+-- WordPress와 같은 애플리케이션에서는 보통 이런 설정을 사용합니다.
+-- i set it in my.cnf
+-- CREATE DATABASE F NOT EXISTS ${MYSQL_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci ;
+CREATE DATABASE F NOT EXISTS ${MYSQL_DATABASE};
 
 -- Create a user account that can connect from any host (%)
 -- The % wildcard allows connections from any IP address

@@ -29,6 +29,10 @@ services:
     restart: always
     env_file:
       - .env
+# MariaDB 설정 파일 내에서 서버 시작을 기다리는 스크립트와 함께 이 Docker healthcheck를 사용하면 시스템의 안정성이 크게 향상됩니다. 
+# 두 가지 접근 방식은 서로 다른 레벨에서 작동하기 때문에 상호 보완적입니다:
+    # MariaDB 컨테이너의 healthcheck는 Docker 시스템에게 컨테이너가 정상인지 알려줍니다.
+    # MariaDB 설정 스크립트 내의 대기 로직은 스크립트가 (데이터베이스가)실행될 때 서버가 준비되었는지 확인합니다.
     healthcheck:
       test: ["CMD", "bash", "-c", "curl -f https://localhost/wp-admin/ || exit 1"]
       interval: 30s
@@ -43,8 +47,9 @@ services:
     volumes:
       # WordPress needs to write to the volume to save data like configuration, plugins, themes, etc. 
       - wordpress_vol:/var/www/html #전체 파일 말고 / there is file that recreated when container gets restarted : but you need this to access every data for the nginx
-      - wordpress_content:/var/www/html/wp-content #wp-content 폴더만 볼륨으로 사용/ DB만 있으면 동일한 사이트를 복원 가능.
+      # wp-content 폴더만 볼륨으로 사용/ DB만 있으면 동일한 사이트를 복원 가능.
       # wp-content 폴더가 /var/www/html 안에 자동으로 생김.
+      - wordpress_content:/var/www/html/wordpress/wp-content 
       # - ./requirements/wordpress/wp-config.php:/var/www/html/wp-config.php
       # - ./requirements/wordpress/plugins:/var/www/html/wp-content/plugins
       # - ./requirements/wordpress/themes:/var/www/html/wp-content/themes
@@ -55,6 +60,7 @@ services:
     restart: always
     env_file:
       - .env
+    # 단순히 PHP-FPM이 실행 중인지가 아니라 WordPress가 실제로 웹 요청에 응답하는지 확인합니다.
     healthcheck:
       test: ["CMD", "bash", "-c", "curl -f http://localhost/wp-includes/version.php || exit 1"]
       interval: 30s

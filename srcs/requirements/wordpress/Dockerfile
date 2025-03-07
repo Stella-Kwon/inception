@@ -20,11 +20,15 @@ RUN apk update && apk add --no-cache \
     unzip
 
 # WordPress 설치
+    #chown → Changes the owner of a file or directory.
+    # -R (Recursive) → Applies the ownership to all files and subdirectories inside /var/www/html/.
+    # nobody:nobody → Assigns the user nobody and group nobody as the owners.
 WORKDIR /var/www/html
 RUN wget https://wordpress.org/latest.zip && \
     unzip latest.zip && \
     rm latest.zip && \
-    chown -R nobody:nobody /var/www/html
+# 기존 nobody 소유권을 nginx로 변경: Nginx 웹 서버가 파일에 접근할 수 있도록 소유권을 변경해야 합니다.
+    chown -R nginx:nginx /var/www/html/
 
 # PHP-FPM 설정 파일 복사
 COPY conf/www.conf /etc/php8/php-fpm.d/www.conf
