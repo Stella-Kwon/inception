@@ -19,6 +19,13 @@ RUN apk update && apk add --no-cache \
     wget \
     unzip
 
+# Create nginx user (in case it doesn’t exist)
+# -D (short for --disabled-password) creates a system user without a password.
+# -g 'nginx' assigns the user to the group named nginx.
+#importanat~~ you need to create here first to connect to nginx
+RUN adduser -D -g 'nginx' nginx
+
+
 # WordPress 설치
     #chown → Changes the owner of a file or directory.
     # -R (Recursive) → Applies the ownership to all files and subdirectories inside /var/www/html/.

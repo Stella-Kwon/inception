@@ -17,12 +17,6 @@ ENV SSL_CERTS=${SSL_CERTS}
 RUN apk update && apk add --no-cache nginx openssl
 
 
-# Create nginx user (in case it doesn’t exist)
-# -D (short for --disabled-password) creates a system user without a password.
-# -g 'nginx' assigns the user to the group named nginx.
-RUN adduser -D -g 'nginx' nginx
-
-
 #for user www-data
 # # Create www-data user and group (matching common Linux IDs)
 # RUN addgroup -g 82 -S www-data && adduser -u 82 -D -S -G www-data www-data
