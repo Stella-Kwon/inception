@@ -58,9 +58,9 @@ clean:
 # Full cleanup including directories
 fclean: clean
 	@echo -e "$(RED)$(BOLD)Full cleanup in progress...$(RESET)"
-#	@docker rm -f mariadb wordpress nginx 2>/dev/null || true
-#	@docker rm -f inception_mariadb inception_wordpress inception_nginx 2>/dev/null || true
-#	@docker rm -f srcs_mariadb srcs_wordpress srcs_nginx 2>/dev/null || true
+	@docker rm -f mariadb wordpress nginx 2>/dev/null || true
+	@docker rm -f inception_mariadb inception_wordpress inception_nginx 2>/dev/null || true
+	@docker rm -f srcs_mariadb srcs_wordpress srcs_nginx 2>/dev/null || true
 	@sudo rm -rf $(DATA_PATH)/wordpress/*
 	@sudo rm -rf $(DATA_PATH)/mariadb/*
 	@echo -e "$(RED)$(BOLD)Project data directories have been cleaned.$(RESET)"
