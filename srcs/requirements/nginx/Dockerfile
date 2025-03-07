@@ -5,8 +5,8 @@ FROM alpine:3.16
 
 
 # Load build arguments (from docker-compose) from .env
-ARG DOMAIN_NAME
-ARG SSL_CERTS
+ARG DOMAIN_NAME = skwon2.42.fr
+ARG SSL_CERTS = /etc/nginx/ssl
 
 # 환경 변수 설정
 ENV SSL_CERTS=${SSL_CERTS}
