@@ -1,3 +1,5 @@
+name : 
+  inception
 services:
   nginx: 
     # image: nginx:1.24-alpine :  this is for using images from opensource from github : specify which version 

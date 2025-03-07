@@ -41,13 +41,27 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 # Configures database
 # 환경 변수로 SQL 파일 생성
 # Everything between the two EOF markers is written to the file /tmp/init.sql
+
+# Check if environment variables are set
+if [ -z "${MYSQL_DATABASE}" ] || [ -z "${MYSQL_USER}" ] || [ -z "${MYSQL_PASSWORD}" ] || [ -z "${MYSQL_ROOT_PASSWORD}" ]; then
+    echo "Error: Required environment variables are not set"
+    exit 1
+fi
+
 cat > /tmp/init.sql << EOF
-CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 EOF
+
+if ! mysql < /tmp/init.sql; then
+    echo "Error: Failed to execute SQL initialization script"
+    cat /tmp/init.sql  # Print the script to see what went wrong
+    exit 1
+fi
+
 
     # SQL 실행
     mysql < /tmp/init.sql

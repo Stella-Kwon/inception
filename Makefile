@@ -73,9 +73,9 @@ status:
 	@echo -e "$(CYAN)$(BOLD)Docker containers status:$(RESET)"
 	@docker ps -a
 	@echo -e "\n$(CYAN)$(BOLD)Docker volumes:$(RESET)"
-	@docker volume ls | grep srcs || echo "$(YELLOW)No project volumes found.$(RESET)"
+	@docker volume ls | grep inception || echo "$(YELLOW)No project volumes found.$(RESET)"
 	@echo -e "\n$(CYAN)$(BOLD)Docker networks:$(RESET)"
-	@docker network ls | grep srcs || echo "$(YELLOW)No project networks found.$(RESET)"
+	@docker network ls | grep inception || echo "$(YELLOW)No project networks found.$(RESET)"
 
 # View logs of all services or specific service
 logs:
