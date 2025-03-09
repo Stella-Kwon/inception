@@ -69,11 +69,11 @@ services:
     env_file:
       - .env
     # 단순히 PHP-FPM이 실행 중인지가 아니라 WordPress가 실제로 웹 요청에 응답하는지 확인합니다.
-  healthcheck:
-    test: ["CMD", "sh", "-c", "nc -z localhost 9000 || exit 1"]
-    interval: 10s
-    timeout: 5s
-    retries: 3
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 9000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
       
   mariadb:
