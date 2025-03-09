@@ -2,20 +2,23 @@
 
 # Check MariaDB connection
 # MariaDB 연결 확인
-# -ge equal of greater
+# -ge means "greater than or equal to"
+
 attempts=0
-while ! mariadb -h$WORDPRESS_DB_HOST -u$WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD $WORDPRESS_DB_NAME &>/dev/null; do
+while ! mariadb -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" &>/dev/null; do
     attempts=$((attempts + 1))
     echo "MariaDB unavailable. Attempt $attempts: Trying again in 5 sec."
-    if [ $attempts -ge 20]; then
+    
+    if [ "$attempts" -ge 50 ]; then  # ✅ Fixed syntax and increased retry limit
         echo "Max attempts reached. MariaDB connection could not be established."
         exit 1
     fi
     sleep 5
 done
+
 echo "MariaDB connection established!"
 echo "Listing databases:"
-mariadb -h$WORDPRESS_DB_HOST -u$WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD $WORDPRESS_DB_NAME <<EOF
+mariadb -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<EOF
 SHOW DATABASES;
 EOF
 
@@ -25,12 +28,6 @@ if [ ! -d "/var/www/html/wordpress" ]; then
 fi
 
 # Check and install WordPress CLI
-# curl command is used to download files from the internet
-# -O (uppercase)	Saves the file with its original name.
-# -o filename (lowercase)	Saves the file with a custom name.
-# wget https://wordpress.org/latest.zip :  same thing as curl -O
-#!/bin/sh
-
 if [ ! -f "/usr/local/bin/wp" ]; then
     echo "Downloading WordPress CLI..."
     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -51,11 +48,11 @@ fi
 if [ ! -f "wp-config.php" ]; then
     echo "Creating WordPress config file..."
     wp config create --allow-root \
-        --dbname=$WORDPRESS_DB_NAME \
-        --dbuser=$WORDPRESS_DB_USER \
-        --dbpass=$WORDPRESS_DB_PASSWORD \
-        --dbhost=$MYSQL_HOST \
-        --path=/var/www/html/wordpress/ \
+        --dbname="$WORDPRESS_DB_NAME" \
+        --dbuser="$WORDPRESS_DB_USER" \
+        --dbpass="$WORDPRESS_DB_PASSWORD" \
+        --dbhost="$WORDPRESS_DB_HOST" \
+        --path="/var/www/html/wordpress/" \
         --force
 fi
 
@@ -64,18 +61,18 @@ if ! wp core is-installed --allow-root; then
     echo "Installing WordPress..."
     # Install WordPress core
     wp core install --allow-root \
-        --url=${DOMAIN_NAME} \
+        --url="${DOMAIN_NAME}" \
         --title="skwon2's Blog" \
-        --admin_user=${WORDPRESS_ADMIN_USER} \
-        --admin_password=${WORDPRESS_ADMIN_PASSWORD} \
-        --admin_email=${WORDPRESS_ADMIN_EMAIL} \
+        --admin_user="${WORDPRESS_ADMIN_USER}" \
+        --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
+        --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
         --skip-email
     
     # Create additional user
     wp user create --allow-root \
-        ${WORDPRESS_USER} ${WORDPRESS_USER_EMAIL} \
+        "${WORDPRESS_USER}" "${WORDPRESS_USER_EMAIL}" \
         --role=author \
-        --user_pass=${WORDPRESS_USER_PASSWORD}
+        --user_pass="${WORDPRESS_USER_PASSWORD}"
     
     # Install and activate theme
     wp theme install neve --activate --allow-root
@@ -90,7 +87,7 @@ fi
 
 # Set permissions 
 echo "Setting file permissions..."
-# set user ngix: group nginix to get the permission to wp
+# Set user nginx: group nginx to get the permission to WordPress
 chown -R nginx:nginx /var/www/html/wordpress
 # 755 권한은 웹 서버(nginx)만 파일을 수정할 수 있게 하여 보안을 강화합니다.
 chmod -R 755 /var/www/html/wordpress
