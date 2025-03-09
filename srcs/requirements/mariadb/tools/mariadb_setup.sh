@@ -77,15 +77,23 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # 환경 변수로 SQL 파일 생성
     # Everything between the two EOF markers is written to the file /tmp/init.sql
 
-
+# DROP DATABASE IF EXISTS test; 
+# DELETE FROM mysql.db WHERE Db='test';
+# CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+# CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+# GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+# FLUSH PRIVILEGES;
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     cat > /tmp/init.sql << EOF
 DROP DATABASE IF EXISTS test; 
 DELETE FROM mysql.db WHERE Db='test';
-CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+
+CREATE DATABASE IF NOT EXISTS `wp_db`;
+CREATE USER IF NOT EXISTS 'wp_db_user'@'%' IDENTIFIED BY 'db_wd_pw';
+GRANT ALL PRIVILEGES ON `wp_db`.* TO 'wp_db_user'@'%';
 FLUSH PRIVILEGES;
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'db_root_pw';
 EOF
 
     echo "Running initial SQL script..."
