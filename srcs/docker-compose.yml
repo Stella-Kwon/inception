@@ -43,10 +43,7 @@ services:
     # MariaDB 컨테이너의 healthcheck는 Docker 시스템에게 컨테이너가 정상인지 알려줍니다.
     # MariaDB 설정 스크립트 내의 대기 로직은 스크립트가 (데이터베이스가)실행될 때 서버가 준비되었는지 확인합니다.
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl -f https://localhost/wp-admin/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3  
+      test: ["CMD", "bash", "-c", "curl -f https://nginx/wp-admin/ || exit 1"]
 
   wordpress:
     build:
@@ -68,15 +65,13 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     # 단순히 PHP-FPM이 실행 중인지가 아니라 WordPress가 실제로 웹 요청에 응답하는지 확인합니다.
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl -f http://localhost/wp-includes/version.php || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+     test: ["CMD", "bash", "-c", "curl -f http://wordpress/wp-includes/version.php || exit 1"]
+
       
   mariadb:
     build:
@@ -88,14 +83,16 @@ services:
       - mariadb_vol:/var/lib/mysql #웹 관련 데이터를 저장할 디렉토리
     networks:
       - inception
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    healthcheck: # this only tells to docker it is ready or not
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s   # Check every 10 seconds
+      timeout: 10s   # Give 10 seconds for a response before failing
+      retries: 10  #Retry 10 times before marking unhealthy
+      start_period: 30s  # Give MariaDB more time to initialize
+
 
 #########################################################
 volumes:  
