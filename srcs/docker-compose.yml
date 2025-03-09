@@ -9,6 +9,9 @@ services:
     build: 
         context: ./requirements/nginx
         dockerfile: Dockerfile
+        args: #you need args to send it to use in dockerfile at runtime build
+        DOMAIN_NAME: ${DOMAIN_NAME}
+        SSL_CERTS: ${SSL_CERTS}
     image: nginx
     container_name: nginx 
     #다른 컨테이너와도 같이 사용할때는 굳이 incpetion을 붙히지않아도 되지만 
@@ -30,7 +33,7 @@ services:
     restart: always
     env_file:
       - .env
-    # you need this to use variable
+    ## you need this to use variable in runtime
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
       SSL_CERTS: ${SSL_CERTS}
@@ -91,6 +94,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
 #########################################################
 volumes:  
   wordpress_vol:

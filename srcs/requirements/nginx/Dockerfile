@@ -7,12 +7,12 @@ FROM alpine:3.16
 # Load build arguments (from docker-compose) from .env 
 # but if you have enviornment in compose file you dont need
 
-# sending through args : variable only during the image build process 
-ARG DOMAIN_NAME=skwon2.42.fr
-ARG SSL_CERTS=/etc/nginx/ssl
+#Build-time arguments (only used during docker build)
+ARG DOMAIN_NAME
+ARG SSL_CERTS
 
-# 환경 변수 설정
-ENV DOMAIN_NAME=skwon2.42.fr
+#Runtime environment variables (persist inside the running container)
+ENV DOMAIN_NAME=${DOMAIN_NAME}
 ENV SSL_CERTS=${SSL_CERTS}
 
 # 필요한 패키지 설치
