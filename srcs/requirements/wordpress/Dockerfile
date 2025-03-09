@@ -17,7 +17,8 @@ RUN apk update && apk add --no-cache \
     php8-phar \
     curl \
     wget \
-    unzip
+    unzip \ 
+    mysql-client
 
 # Create nginx user (in case it doesn’t exist)
 # -D (short for --disabled-password) creates a system user without a password.
