@@ -1,5 +1,5 @@
 #!/bin/sh
-# Switch to bash for better heredoc support
+# Alpine uses BusyBox sh, so avoid bash-specific features
 # Enable debugging
 set -x
 
@@ -11,7 +11,7 @@ echo "MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}"
 
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "No existing database found, initializing MariaDB..."
-
+    
     # Initialize database
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
     echo "MariaDB data directory initialized."
@@ -19,20 +19,20 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # Start temporary MariaDB server WITHOUT NETWORKING
     # This is important for security during initialization
     mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
-    
-    # Store the process ID
     MYSQL_PID=$!
     
     echo "Waiting for MariaDB to start..."
     count=0
     max_wait=60
     
-    # Wait for startup
-    until mysqladmin ping --silent; do
+    # Wait for startup (with proper error handling for Alpine)
+    until mysqladmin ping >/dev/null 2>&1
+    do
         sleep 2
         count=$((count+2))
         if [ $count -gt $max_wait ]; then
             echo "Error: MariaDB took too long to start"
+            kill $MYSQL_PID
             exit 1
         fi
     done
@@ -41,41 +41,36 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # Check environment variables
     if [ -z "${MYSQL_DATABASE}" ] || [ -z "${MYSQL_USER}" ] || [ -z "${MYSQL_PASSWORD}" ] || [ -z "${MYSQL_ROOT_PASSWORD}" ]; then
         echo "Error: Required environment variables are not set"
+        kill $MYSQL_PID
         exit 1
     fi
 
-    # Important: Using a different approach for setting the root password
-    # This sets the password using a different method
+    # Setup the database and user first
     echo "Setting up database and users..."
-    
-    # First create database and users without setting root password
-    mysql --user=root <<EOF
+    mysql -u root <<EOF
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test';
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+GRANT ALL ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOF
-
+    
     # Verify user creation
     echo "Verifying user creation..."
-    mysql --user=root -e "SELECT User, Host FROM mysql.user WHERE User='${MYSQL_USER}';"
+    mysql -u root -e "SELECT User, Host FROM mysql.user WHERE User='${MYSQL_USER}';"
     
-    # Set root password using separate command
+    # Set root password
     echo "Setting root password..."
-    mysqladmin -u root password "${MYSQL_ROOT_PASSWORD}"
-    
-    # Verify we can connect with the new password
-    echo "Verifying root password..."
-    mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" status
+    # Use SQL command instead of mysqladmin for greater compatibility
+    mysql -u root <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+FLUSH PRIVILEGES;
+EOF
     
     # Shutdown MariaDB gracefully
     echo "Stopping temporary MariaDB server..."
-    mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
-    
-    # Make sure it's really stopped
-    wait $MYSQL_PID || true
+    mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown || kill $MYSQL_PID
 fi
 
 # Start MariaDB as the main process
