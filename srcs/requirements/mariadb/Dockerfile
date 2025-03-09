@@ -71,7 +71,7 @@ RUN mkdir -p /run/mysqld /var/lib/mysql
 #The mysql user has proper permissions to write socket and PID files
 # MariaDB can start without permission errors
 RUN chown -R mysql:mysql /run/mysqld /var/lib/mysql
-
+RUN chmod 755 /run/mysqld
 #port 3306 is the standard default port for MySQL/MariaDB
 EXPOSE 3306
 
