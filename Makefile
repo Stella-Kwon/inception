@@ -34,11 +34,11 @@ host_backup_dirs:
 	@mkdir -p $(DATA_PATH)/mariadb
 
 # Build and start containers
+#-d : only gives you an access to the terminal while it is runniing. 
+# so all the logs will be hidden 
+# It starts the container in the background and returns control to your terminal. 
 up: host_backup_dirs
 	@echo -e "$(GREEN)Building and starting containers...$(RESET)"
-#-d : only gives you an access to the terminal while it is runniing. so all the logs will be hidden😂 
-# It starts the container in the background and returns control to your terminal. That is all what it does. 
-
 	@docker compose -f $(DOCKER_COMPOSE_FILE) up -d --build
 	@echo -e "$(GREEN)$(BOLD)Inception is now running!$(RESET)"
 	@echo -e "$(GREEN)Access your website at https://$(DOMAIN_NAME)$(RESET)"
