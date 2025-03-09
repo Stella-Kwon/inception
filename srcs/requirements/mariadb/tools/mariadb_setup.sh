@@ -1,4 +1,4 @@
-# 
+
 #!/bin/bash
 # Switch to bash for better heredoc support
 # Enable debugging
