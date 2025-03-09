@@ -65,7 +65,7 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
     # 단순히 PHP-FPM이 실행 중인지가 아니라 WordPress가 실제로 웹 요청에 응답하는지 확인합니다.
@@ -83,7 +83,7 @@ services:
       - mariadb_vol:/var/lib/mysql #웹 관련 데이터를 저장할 디렉토리
     networks:
       - inception
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
     healthcheck: # this only tells to docker it is ready or not

@@ -78,23 +78,29 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
  # can use this alternative way then below.
     # # 환경 변수를 init.sql 파일에 적용
     # # Use envsubst to replace environment variables in the SQL file
-    envsubst < /docker-entrypoint-initdb.d/init.sql > /tmp/init.sql
+    # envsubst < /docker-entrypoint-initdb.d/init.sql > /tmp/init.sql
 
     # Configures database
     # 환경 변수로 SQL 파일 생성
     # Everything between the two EOF markers is written to the file /tmp/init.sql
 
 
-#     cat > /tmp/init.sql << EOF
-# DROP DATABASE IF EXISTS test; 
-# DELETE FROM mysql.db WHERE Db='test';
-# CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
-# CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-# GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
-# FLUSH PRIVILEGES;
-# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-# EOF
+    cat > /tmp/init.sql << EOF
+DROP DATABASE IF EXISTS test; 
+DELETE FROM mysql.db WHERE Db='test';
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+EOF
 
+      # Make sure the file has proper permissions
+    chmod 644 /tmp/init.sql
+
+    echo "Contents of initialization script:"
+    cat /tmp/init.sql
+    
     echo "Running initial SQL script..."
     if ! mysql < /tmp/init.sql; then
         echo "Error: Failed to execute SQL initialization script"
