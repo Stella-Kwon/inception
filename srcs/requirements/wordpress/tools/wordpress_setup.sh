@@ -1,10 +1,24 @@
 #!/bin/sh
+# Your script is trying to use the mariadb command, 
+# but the WordPress container probably only has the mysql command installed. 
+# This is why creating a symbolic link (ln -sf /usr/bin/mysql /usr/bin/mariadb) is a good solution 
+# - it lets your script continue to use the mariadb command, 
+# which will actually execute the mysql command behind the scenes.
 
+# link my sql to mariadb
+# Create symbolic link if needed
+# if [ ! -f "/usr/bin/mariadb" ] && [ -f "/usr/bin/mysql" ]; then
+#     echo "Creating symbolic link from mysql to mariadb..."
+#     ln -sf /usr/bin/mysql /usr/bin/mariadb
+# fi
+
+#####here i change to mysql -h ~~~~ 
+#####not mariadb -h ~~~~~
 # Check MariaDB connection
 # MariaDB 연결 확인
 # -ge means "greater than or equal to"
 attempts=0
-while ! mariadb -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" &>/dev/null; do
+while ! mysql -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" &>/dev/null; do
     attempts=$((attempts + 1))
     echo "MariaDB unavailable. Attempt $attempts: Trying again in 5 sec."
     if [ "$attempts" -ge 50 ]; then  # Fixed syntax and increased retry limit
@@ -16,7 +30,7 @@ done
 echo "MariaDB connection established!"
 
 echo "Listing databases:"
-mariadb -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<EOF
+mysql -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<EOF
 SHOW DATABASES;
 EOF
 
