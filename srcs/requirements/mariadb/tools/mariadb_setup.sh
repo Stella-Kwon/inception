@@ -2,6 +2,13 @@
 # If any command fails, the script stops immediately instead of continuing with potential errors.
 set -e
 
+
+echo "Checking environment variables..."
+echo "MYSQL_DATABASE: ${MYSQL_DATABASE}"
+echo "MYSQL_USER: ${MYSQL_USER}"
+echo "MYSQL_PASSWORD: ${MYSQL_PASSWORD}"
+echo "MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}"
+
 # 데이터베이스 디렉토리가 비어있는지 확인
 #  [-d PATH ] returns true if PATH exists and is a directory
 #  [ ! -d PATH ] returns true if PATH does not exist or is not a directory
@@ -71,12 +78,14 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
  # can use this alternative way then below.
     # # 환경 변수를 init.sql 파일에 적용
     # # Use envsubst to replace environment variables in the SQL file
-    # envsubst < /docker-entrypoint-initdb.d/init.sql > /tmp/init.sql
+    envsubst < /docker-entrypoint-initdb.d/init.sql > /tmp/init.sql
 
     # Configures database
     # 환경 변수로 SQL 파일 생성
     # Everything between the two EOF markers is written to the file /tmp/init.sql
 
+
+#     cat > /tmp/init.sql << EOF
 # DROP DATABASE IF EXISTS test; 
 # DELETE FROM mysql.db WHERE Db='test';
 # CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
@@ -84,17 +93,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 # GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 # FLUSH PRIVILEGES;
 # ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    cat > /tmp/init.sql << EOF
-DROP DATABASE IF EXISTS test; 
-DELETE FROM mysql.db WHERE Db='test';
-
-CREATE DATABASE IF NOT EXISTS `wp_db`;
-CREATE USER IF NOT EXISTS 'wp_db_user'@'%' IDENTIFIED BY 'db_wd_pw';
-GRANT ALL PRIVILEGES ON `wp_db`.* TO 'wp_db_user'@'%';
-FLUSH PRIVILEGES;
-
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'db_root_pw';
-EOF
+# EOF
 
     echo "Running initial SQL script..."
     if ! mysql < /tmp/init.sql; then
