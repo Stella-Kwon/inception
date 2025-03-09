@@ -85,36 +85,56 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # Everything between the two EOF markers is written to the file /tmp/init.sql
 
 
-    cat > /tmp/init.sql << EOF
-DROP DATABASE IF EXISTS test; 
+#     cat > /tmp/init.sql << EOF
+# DROP DATABASE IF EXISTS test; 
+# DELETE FROM mysql.db WHERE Db='test';
+# CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+# CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+# GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+# FLUSH PRIVILEGES;
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+# EOF
+
+#       # Make sure the file has proper permissions
+#     chmod 644 /tmp/init.sql
+
+mysql -u root <<EOF
+# Remove test database
+DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test';
+
+# Create database and user
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
+
+# Set root password
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 EOF
-
-      # Make sure the file has proper permissions
-    chmod 644 /tmp/init.sql
-
-    echo "Contents of initialization script:"
-    cat /tmp/init.sql
     
-    echo "Running initial SQL script..."
-    if ! mysql < /tmp/init.sql; then
-        echo "Error: Failed to execute SQL initialization script"
-        cat /tmp/init.sql  # Print the script for debugging
-        exit 1
-    fi
-    echo "Initial SQL script executed successfully!"
+    # Verify the user was created correctly
+    mysql -u root -e "SELECT User, Host FROM mysql.user WHERE User='${MYSQL_USER}';"
+
+
+
+    # echo "Contents of initialization script:"
+    # cat /tmp/init.sql
+
+    # echo "Running initial SQL script..."
+    # if ! mysql < /tmp/init.sql; then
+    #     echo "Error: Failed to execute SQL initialization script"
+    #     cat /tmp/init.sql  # Print the script for debugging
+    #     exit 1
+    # fi
+    # echo "Initial SQL script executed successfully!"
 
     # Shut down temporary MariaDB process
     echo "Stopping temporary MariaDB server..."
     mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
 
     # Remove temporary SQL script
-    rm /tmp/init.sql
+    # rm /tmp/init.sql
 fi
 
 # Start MariaDB as the main process
