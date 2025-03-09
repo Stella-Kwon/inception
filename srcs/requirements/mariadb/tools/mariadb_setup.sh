@@ -5,7 +5,12 @@
 #  [-d PATH ] returns true if PATH exists and is a directory
 #  [ ! -d PATH ] returns true if PATH does not exist or is not a directory
 # This checks for a specific required system table file, which would only exist in a properly initialized MariaDB installation.
-if [ ! -d "/var/lib/mysql/mysql/user.frm" ]; then
+# if [ ! -d "/var/lib/mysql/mysql/user.frm" ]; then
+# but user.frm 대신 mysql 디렉토리 자체를 확인해야 합니다.
+# user.frm은 일부 MariaDB 버전에서는 존재하지 않을 수도 있습니다.
+# MariaDB가 정상적으로 초기화되면 /var/lib/mysql/mysql 디렉터리가 생성되므로, 이걸 기준으로 검사해야 합니다.
+   
+if [ ! -d "/var/lib/mysql/mysql" ]; then
     # 데이터베이스 초기화
     # Creates database files
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
@@ -28,8 +33,8 @@ if [ ! -d "/var/lib/mysql/mysql/user.frm" ]; then
 # If the command fails (server not ready), sleep for 1 second
 # Repeat until the command succeeds (which means the server is up)
     
-# Wait for server to start with timeout
-#-gt : greater than
+# # Wait for server to start with timeout
+# #-gt : greater than
 # count=0
 # until mysqladmin ping >/dev/null 2>&1; do
 #     sleep 1
