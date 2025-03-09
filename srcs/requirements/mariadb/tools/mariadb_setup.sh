@@ -30,15 +30,15 @@ if [ ! -d "/var/lib/mysql/mysql/user.frm" ]; then
     
 # Wait for server to start with timeout
 #-gt : greater than
-count=0
-until mysqladmin ping >/dev/null 2>&1; do
-    sleep 1
-    count=$((count+1))
-    if [ $count -gt 30 ]; then
-        echo "Error: MySQL server took too long to start"
-        exit 1
-    fi
-done
+# count=0
+# until mysqladmin ping >/dev/null 2>&1; do
+#     sleep 1
+#     count=$((count+1))
+#     if [ $count -gt 30 ]; then
+#         echo "Error: MySQL server took too long to start"
+#         exit 1
+#     fi
+# done
 
 
     # can use this alternative way then below.

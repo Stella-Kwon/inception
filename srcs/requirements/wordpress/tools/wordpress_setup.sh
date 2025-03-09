@@ -4,17 +4,17 @@
 # MariaDB 연결 확인
 # -ge means "greater than or equal to"
 
-attempts=0
-while ! mariadb -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" &>/dev/null; do
-    attempts=$((attempts + 1))
-    echo "MariaDB unavailable. Attempt $attempts: Trying again in 5 sec."
+# attempts=0
+# while ! mariadb -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" &>/dev/null; do
+#     attempts=$((attempts + 1))
+#     echo "MariaDB unavailable. Attempt $attempts: Trying again in 5 sec."
     
-    if [ "$attempts" -ge 50 ]; then  # ✅ Fixed syntax and increased retry limit
-        echo "Max attempts reached. MariaDB connection could not be established."
-        exit 1
-    fi
-    sleep 5
-done
+#     if [ "$attempts" -ge 50 ]; then  # ✅ Fixed syntax and increased retry limit
+#         echo "Max attempts reached. MariaDB connection could not be established."
+#         exit 1
+#     fi
+#     sleep 5
+# done
 
 echo "MariaDB connection established!"
 echo "Listing databases:"

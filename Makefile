@@ -39,7 +39,7 @@ host_backup_dirs:
 # It starts the container in the background and returns control to your terminal. 
 up: host_backup_dirs
 	@echo -e "$(GREEN)Building and starting containers...$(RESET)"
-	@docker compose -f $(DOCKER_COMPOSE_FILE) up --build
+	@docker compose -f $(DOCKER_COMPOSE_FILE) up -d --build
 	@echo -e "$(GREEN)$(BOLD)Inception is now running!$(RESET)"
 	@echo -e "$(GREEN)Access your website at https://$(DOMAIN_NAME)$(RESET)"
 
