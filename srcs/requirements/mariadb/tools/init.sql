@@ -9,7 +9,6 @@
 DROP DATABASE IF EXISTS test; 
 DELETE FROM mysql.db WHERE Db='test';
 
-
 --이것은 검색이나 정렬 시 대소문자 구분 없이 결과를 반환하게 됩니다.
 -- WordPress와 같은 애플리케이션에서는 보통 이런 설정을 사용합니다.
 
