@@ -18,9 +18,7 @@ services:
     #여러 프로젝트와 연결되어 사용되면 주로 proxy_nginx와 같이 사용.
     #현재는 incpetion에서만 사용하기 때문에 (하나의 도메인 + 443포트 연결) incpetion을 붙힌다.
     ports:
-      #but now i am using port 443 fot the vm host to connect my real host so i cannot use 443 now
-      - 5000:443
-      # - "443:443" #HTTPS rediects : Then Docker automatically binds port 443 on the host to port 443 in the container.
+      - "443:443" #HTTPS rediects : Then Docker automatically binds port 443 on the host to port 443 in the container.
       # - "80:80" HTTP redirects
     volumes:
       #Nginx needs to access the WordPress files (PHP files, images, CSS, etc.) to serve them
