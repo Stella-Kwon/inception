@@ -28,8 +28,8 @@ RUN apk update && apk add --no-cache nginx openssl
 # SSL 설정
 RUN mkdir -p ${SSL_CERTS}
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout "${SSL_CERTS}/nginx.key" \
-    -out "${SSL_CERTS}/nginx.crt" \
+    -keyout "${SSL_CERTS}/${DOMAIN_NAME}.key" \
+    -out "${SSL_CERTS}/${DOMAIN_NAME}.crt" \
     -subj "/C=FI/ST=Uusimaa/L=Helsinki/O=Hive/CN=${DOMAIN_NAME}"
 
 # NGINX 설정 파일 복사
