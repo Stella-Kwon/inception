@@ -37,7 +37,7 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 
 # 디렉토리 생성
-RUN mkdir -p /var/www/html
+RUN mkdir -p /var/www/html/wordpress
 
 #NGINX requires a directory to store its PID (Process ID) file and other runtime data.
 RUN mkdir -p /run/nginx 
