@@ -90,7 +90,7 @@ services:
     env_file:
       - .env
     healthcheck: # this only tells to docker it is ready or not
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s   # Check every 10 seconds
       timeout: 10s   # Give 10 seconds for a response before failing
       retries: 10  #Retry 10 times before marking unhealthy
