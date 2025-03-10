@@ -36,7 +36,7 @@ RUN wget https://wordpress.org/latest.zip && \
     unzip latest.zip && \
     rm latest.zip && \
 # 기존 nobody 소유권을 nginx로 변경: Nginx 웹 서버가 파일에 접근할 수 있도록 소유권을 변경해야 합니다.
-    chown -R nginx:nginx /var/www/html/
+    chown -R nginx:nginx /var/www/html/wordpress
 
 # PHP-FPM 설정 파일 복사
 COPY conf/www.conf /etc/php8/php-fpm.d/www.conf
