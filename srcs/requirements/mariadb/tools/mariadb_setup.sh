@@ -3,11 +3,11 @@
 # Enable debugging
 set -x
 
-echo "Checking environment variables..."
-echo "MYSQL_DATABASE: ${MYSQL_DATABASE}"
-echo "MYSQL_USER: ${MYSQL_USER}"
-echo "MYSQL_PASSWORD: ${MYSQL_PASSWORD}"
-echo "MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}"
+# echo "Checking environment variables..."
+# echo "MYSQL_DATABASE: ${MYSQL_DATABASE}"
+# echo "MYSQL_USER: ${MYSQL_USER}"
+# echo "MYSQL_PASSWORD: ${MYSQL_PASSWORD}"
+# echo "MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}"
 
 # 데이터베이스 디렉토리가 비어있는지 확인
     #  [-d PATH ] returns true if PATH exists and is a directory

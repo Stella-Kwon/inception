@@ -43,11 +43,11 @@ services:
     # MariaDB 컨테이너의 healthcheck는 Docker 시스템에게 컨테이너가 정상인지 알려줍니다.
     # MariaDB 설정 스크립트 내의 대기 로직은 스크립트가 (데이터베이스가)실행될 때 서버가 준비되었는지 확인합니다.
     healthcheck:
-      test: ["CMD", "curl", "-f", "-k", "https://localhost/wp-admin/", "||", "exit", "1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
+      test: ["CMD", "sh", "-c", "curl -f -k https://localhost/wp-admin/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 60s
 
   wordpress:
     build:
@@ -77,10 +77,12 @@ services:
       - .env
     # 단순히 PHP-FPM이 실행 중인지가 아니라 WordPress가 실제로 웹 요청에 응답하는지 확인합니다.
     healthcheck:
-      test: ["CMD", "sh", "-c", "nc -z localhost 9000 || nc -z ::1 9000 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost/wp-admin/install.php || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 60s
+
 
       
   mariadb:
