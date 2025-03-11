@@ -77,7 +77,8 @@ services:
       - .env
     # 단순히 PHP-FPM이 실행 중인지가 아니라 WordPress가 실제로 웹 요청에 응답하는지 확인합니다.
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/wp-admin/install.php || exit 1"]
+      # test: ["CMD", "curl", "-f", "http://localhost/wp-admin/install.php || exit 1"]
+      test: ["CMD", "sh", "-c", "nc -z localhost 9000 || nc -z ::1 9000 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 6
